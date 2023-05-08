@@ -3,6 +3,7 @@ import operator
 from torch import nn
 import torch as th
 import torch.nn.functional as F
+import gymnasium
 
 class TabularGridNet(nn.Module):
     def __init__(self, n_actions, grid_shape, max_steps):
@@ -151,10 +152,10 @@ class PongNet3(th.nn.Module):
 
     def __init__(self, obs_space, n_actions=6):
         super().__init__()
-        from stable_baselines3_lib.torch_layers import NatureCNN
+        from sb3.common.torch_layers import NatureCNN
         import numpy as np
         import gym
-        obs_space = gym.spaces.Box( np.zeros((4,84,84), dtype=np.float32) , np.zeros((4,84,84), dtype=np.float32)+255)
+        obs_space = gymnasium.spaces.box.Box( np.zeros((4,84,84), dtype=np.float32) , np.zeros((4,84,84), dtype=np.float32)+255, dtype=np.uint8)
         self.net = NatureCNN(obs_space)
         self.linear_q = th.nn.Linear(512+1, 64)
         self.linear_q2 = th.nn.Linear(64, n_actions)
@@ -305,32 +306,32 @@ def get_models(net_tag, n_actions, max_steps, obs_shape, other_shapes_dct, devic
                                                 max_steps=max_steps,).to(device)
         return {"net": net, "target_net": target_net}, lambda: net.parameters()
     elif net_tag in ["pong"]:
-        obs_space = th.load("models/pong_obsspace.pt")
+        obs_space = th.load("pong_obsspace.pt")
         net = PongNet(obs_space).to(device)
         target_net = PongNet(obs_space).to(device)
         return {"net": net, "target_net": target_net}, lambda: net.parameters()
     elif net_tag in ["pong3"]:
-        obs_space = th.load("models/pong_obsspace.pt")
+        obs_space = th.load("pong_obsspace.pt")
         net = PongNet3(obs_space).to(device)
         target_net = PongNet3(obs_space).to(device)
         return {"net": net, "target_net": target_net}, lambda: net.parameters()
     elif net_tag in ["pongres"]:
-        obs_space = th.load("models/pong_obsspace.pt")
+        obs_space = th.load("pong_obsspace.pt")
         net = PongNet3(obs_space, n_actions=2).to(device)
         target_net = PongNet3(obs_space, n_actions=2).to(device)
         return {"net": net, "target_net": target_net}, lambda: net.parameters()
     elif net_tag in ["breakout"]:
-        obs_space = th.load("models/pong_obsspace.pt")
+        obs_space = th.load("pong_obsspace.pt")
         net = BreakoutNet(obs_space).to(device)
         target_net = BreakoutNet(obs_space).to(device)
         return {"net": net, "target_net": target_net}, lambda: net.parameters()
     elif net_tag in ["breakoutsb3"]:
-        obs_space = th.load("models/pong_obsspace.pt")
+        obs_space = th.load("pong_obsspace.pt")
         net = BreakoutSB3Net(obs_space).to(device)
         target_net = BreakoutSB3Net(obs_space).to(device)
         return {"net": net, "target_net": target_net}, lambda: net.parameters()
     elif net_tag in ["cartpolesb3"]:
-        obs_space = th.load("models/pong_obsspace.pt")
+        obs_space = th.load("pong_obsspace.pt")
         net = CartpoleSB3Net(obs_space).to(device)
         target_net = CartpoleSB3Net(obs_space).to(device)
         return {"net": net, "target_net": target_net}, lambda: net.parameters()

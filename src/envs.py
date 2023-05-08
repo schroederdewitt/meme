@@ -4,11 +4,14 @@ import numpy as np
 import torch as th
 from typing import Any, Callable, Dict, List, NamedTuple, Tuple, Union
 
-from stable_baselines3_lib import pong
+#from stable_baselines3_lib import pong
+from sb3.common.env_util import make_atari_env
+from sb3.common.vec_env import VecFrameStack
 
 GymObs = Union[Tuple, Dict[str, Any], np.ndarray, int]
 GymStepReturn = Tuple[GymObs, float, bool, Dict]
 
+class PongN():
 
     def __init__(self, **kwargs):
         self.pong_n_games = kwargs.get("pong_n_games", 21)
@@ -26,9 +29,9 @@ GymStepReturn = Tuple[GymObs, float, bool, Dict]
         return {"player1": th.from_numpy(obs[0])}, reward[0], done, info
 
     def reset(self):
-        self.env = pong.make_atari_env('PongNoFrameskip-v4', n_envs=1,
+        self.env = make_atari_env('PongNoFrameskip-v4', n_envs=1,
                                        seed=0, wrapper_kwargs={"noop_max":0})  # wrapper_kwargs={"clip_reward": False, "pong_just_one_step": True},
-        self.env = pong.VecFrameStack(self.env, n_stack=4)
+        self.env = VecFrameStack(self.env, n_stack=4)
         obs = self.env.reset()
         self.game_ctr = 0
         self.steps = 0
@@ -72,9 +75,9 @@ class PongNRestrictedActionSpace():
         return {"player1": th.from_numpy(obs[0])}, reward[0], done, info
 
     def reset(self):
-        self.env = pong.make_atari_env('PongNoFrameskip-v4', n_envs=1,
+        self.env = make_atari_env('PongNoFrameskip-v4', n_envs=1,
                                        seed=0, wrapper_kwargs={"noop_max":0})  # wrapper_kwargs={"clip_reward": False, "pong_just_one_step": True},
-        self.env = pong.VecFrameStack(self.env, n_stack=4)
+        self.env = VecFrameStack(self.env, n_stack=4)
         obs = self.env.reset()
         self.game_ctr = 0
         self.steps = 0
